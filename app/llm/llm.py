@@ -1,6 +1,16 @@
-from langchain_ollama import OllamaLLM
+from dotenv import load_dotenv
+import os
+from langchain_groq import ChatGroq
 
-llm = OllamaLLM(model="llama3.2" , temperature=0)
+load_dotenv()  
+
+llm = ChatGroq(
+    model="llama-3.1-8b-instant",
+    temperature=0,
+    api_key=os.getenv("GROQ_API_KEY")
+)
 
 def generate_answer(prompt):
-    return llm.invoke(prompt)
+    response = llm.invoke(prompt)
+    return response.content
+    
