@@ -10,4 +10,8 @@ public class AppDBContext : DbContext
     }
 
     public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Chat> Chats { get; set; } = null!;
+    public DbSet<ChatMessage> ChatMessages { get; set; } = null!;
+    public DbSet<PdfFile> PdfFiles { get; set; } = null!;
 }
+
