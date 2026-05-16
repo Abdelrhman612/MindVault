@@ -1,0 +1,53 @@
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=${SA_PASSWORD}
+    ports:
+      - "1344:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  ai-service:
+    build: ./ai-service
+    container_name: ai_service
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./.env
+
+  backend:
+    build: ./backend
+    container_name: backend_api
+    ports:
+      - "4000:8080"
+    env_file:
+      - ./.env
+    environment:
+      - ConnectionStrings__DefaultConnection=${DEFAULT_CONNECTION}
+      - Jwt__Key=${JWT_KEY}
+      - Jwt__Issuer=${JWT_ISSUER}
+      - Jwt__Audience=${JWT_AUDIENCE}
+      - AiService__BaseUrl=http://ai-service:5000
+      - PORT=8080
+    depends_on:
+      - database
+      - ai-service
+
+  frontend:
+    build: 
+      context: ./frontend
+      args:
+        - VITE_API_URL=${VITE_API_URL}
+    container_name: frontend_app
+    ports:
+      - "4001:80"
+    env_file:
+      - ./.env
+    depends_on:
+      - backend
+
+volumes:
+  sql_data:
